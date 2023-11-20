@@ -1,4 +1,6 @@
+import { GenericRecord } from '@/types';
 import store from './raven-connection';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface ISeacrOptions {
     key?: string;
@@ -7,34 +9,47 @@ export interface ISeacrOptions {
     page?: number;
 }
 
-export type GenericRecord = Record<string, unknown>;
-
 const magic = Symbol();
 
 export class DocumentFactory {
     private [magic] = 'unique';
+
     constructor(document: GenericRecord) {
+        if (!document) {
+            console.warn(document);
+            return;
+        }
         Object.keys(document).forEach(key => {
+            if (typeof key === 'symbol') return;
             (this as Record<string, unknown>)[key] = document[key];
         });
     }
 }
 
-export async function createDocument<T extends DocumentFactory>({
+export async function createDocument({
     collection,
     document,
 }: {
     collection: string;
-    document: T;
-}) {
+    document: object;
+}): Promise<object & { id: string }> {
     let session = store.openSession();
-    await session.store(document, `/${collection}`);
+    const id = uuidv4();
+    (document as any)._id = id;
+    await session.store(document, `/${collection}/${id}`);
     await session.saveChanges();
+    return (document as any).id;
 }
 
-export async function getDocument<T>(id: string): Promise<T | null> {
+export async function getDocument<T>({
+    collection,
+    id,
+}: {
+    collection: string;
+    id: string;
+}): Promise<T | null> {
     let session = store.openSession();
-    let payload = await session.load(id);
+    let payload = session.query({ collection }).whereEquals('_id', id);
     return payload as T | null;
 }
 
@@ -65,33 +80,34 @@ export async function bulkInsertDocumnets(payload: object[]) {
     await session.saveChanges();
 }
 
-class User extends DocumentFactory {
-    name: string;
-    email: string;
-    age: number;
-
-    constructor(document: GenericRecord) {
-        super(document);
-        this.name = document.name as string;
-        this.email = document.email as string;
-        this.age = document.age as number;
-    }
+export async function deleteDocument({
+    id,
+}: {
+    collection: string;
+    id: string;
+}) {
+    let session = store.openSession();
+    await session.delete(id);
+    await session.saveChanges();
 }
 
-async function main() {
-    const newUser = {
-        name: 'John Doe',
-        email: 'johndoe@example.com',
-        age: 30,
-    };
+export async function deleteCollection(collectionName: string): Promise<void> {
+    const session = store.openSession();
 
     try {
-        await createDocument({
-            collection: 'users',
-            document: new User(newUser),
-        });
-        console.log('User document created successfully');
+        const query = session.query({ collection: collectionName });
+        const documents = await query.all();
+
+        // Delete each document
+        for (const doc of documents) {
+            await session.delete((doc as { id: string }).id);
+        }
+
+        await session.saveChanges();
     } catch (error) {
-        console.error('Error creating user document:', error);
+        console.error('Error deleting documents:', error);
+        throw error;
+    } finally {
+        session.dispose();
     }
 }
