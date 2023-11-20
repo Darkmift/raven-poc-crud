@@ -1,0 +1,491 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "THE CRM",
+    "description": "A CRM PROJECT",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "darkmift@gmail.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.11"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:5000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "user",
+      "description": "Operations about user"
+    },
+    {
+      "name": "year",
+      "description": "Operations about year"
+    }
+  ],
+  "paths": {
+    "/user": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Add a new user to the system",
+        "operationId": "addUser",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, user not created"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get a list of all users",
+        "operationId": "getUsers",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error occurred while retrieving users"
+          }
+        }
+      }
+    },
+    "/user/{id}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get a user by ID",
+        "operationId": "getUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user to fetch",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No user found with the given ID"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Update a user",
+        "operationId": "editUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user to update",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, user not updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Delete a user",
+        "operationId": "removeUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the user to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User deleted successfully"
+          },
+          "400": {
+            "description": "No user found with the given ID"
+          }
+        }
+      }
+    },
+    "/user/email/{email}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get a user by email",
+        "operationId": "getUserByEmail",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "Email of the user to fetch",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No user found with the given email"
+          }
+        }
+      }
+    },
+    "/year": {
+      "post": {
+        "tags": [
+          "year"
+        ],
+        "summary": "Add a new year to the system",
+        "operationId": "addYear",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Year"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Year created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Year"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, year not created"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "year"
+        ],
+        "summary": "Get a list of all years",
+        "operationId": "getYears",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Year"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error occurred while retrieving years"
+          }
+        }
+      }
+    },
+    "/year/{id}": {
+      "get": {
+        "tags": [
+          "year"
+        ],
+        "summary": "Get a year by ID",
+        "operationId": "getYearById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the year to fetch",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Year"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No year found with the given ID"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "year"
+        ],
+        "summary": "Update a year",
+        "operationId": "editYear",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the year to update",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Year"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Year updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Year"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input, year not updated"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "year"
+        ],
+        "summary": "Delete a year",
+        "operationId": "removeYear",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the year to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Year deleted successfully"
+          },
+          "400": {
+            "description": "No year found with the given ID"
+          }
+        }
+      }
+    },
+    "/year/year/{year}": {
+      "get": {
+        "tags": [
+          "year"
+        ],
+        "summary": "Get a year by year number",
+        "operationId": "getYearByYearNumber",
+        "parameters": [
+          {
+            "name": "year",
+            "in": "path",
+            "description": "Year number to fetch",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Year"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No year found with the given year number"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Doe"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@email.com"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "list",
+              "of",
+              "your",
+              "roles"
+            ],
+            "example": "user"
+          },
+          "password": {
+            "type": "string",
+            "example": "12345"
+          },
+          "confirmPassword": {
+            "type": "string",
+            "example": "12345"
+          }
+        },
+        "xml": {
+          "name": "User"
+        }
+      },
+      "Year": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "string",
+            "example": "2023"
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "xml": {
+          "name": "Year"
+        }
+      }
+    }
+  }
+}
