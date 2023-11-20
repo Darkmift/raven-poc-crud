@@ -13,4 +13,5 @@ export const {
     LOG_DIR,
     RAVEN_URL,
     RAVEN_DATABASE,
+    RAVEN_PASSWORD,
 } = process.env as ConfigVars;
