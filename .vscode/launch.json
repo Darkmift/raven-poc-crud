@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "command": "yarn dev",
+      "name": "Run Server",
+      "request": "launch",
+      "type": "node-terminal",
+      "cwd": "${workspaceFolder}/server"
+    },
+    {
+      "name": "Run Server:test",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "yarn test",
+      "cwd": "${workspaceFolder}/server"
+    }
+  ]
+}
