@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { getById, getAll } from './services';
+import { getById, getAll } from './user.service';
 
 export const getUserById = async (
     req: Request,
@@ -7,7 +7,10 @@ export const getUserById = async (
     next: NextFunction,
 ) => {
     try {
-        const result = await getById(req.params.id);
+        const result = await getById({
+            collection: 'users',
+            id: req.params.id,
+        });
         res.status(200).json(result);
     } catch (error) {
         next(error);

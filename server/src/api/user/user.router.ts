@@ -1,7 +1,7 @@
 import { joiValidateMiddleware } from '@/api/common/middlwares/joi';
 import { Router } from 'express';
 import Joi from 'joi';
-import { getUserById, getUsers } from './controller';
+import { getUserById, getUsers } from './user.controller';
 
 const router = Router();
 
