@@ -4,7 +4,9 @@ import { resolve } from 'path';
 
 // Sync object
 const config: Config.InitialOptions = {
+    preset: 'ts-jest',
     testEnvironment: 'node',
+    setupFiles: ['<rootDir>/jest.setup.ts'],
     testEnvironmentOptions: {
         NODE_ENV: 'test',
     },
