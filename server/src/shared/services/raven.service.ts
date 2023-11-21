@@ -1,108 +1,105 @@
 import { GenericRecord } from '@/types';
 import store from './raven-connection';
 import { v4 as uuidv4 } from 'uuid';
+import { User, UsersIndex } from '@/api/user/user.service';
+import { logger } from '@/utils/logger';
 
-export interface ISeacrOptions {
+export interface ISearchOptions {
     key?: string;
     whereRegex?: string;
     limit?: number;
     page?: number;
 }
 
+const models = { User };
+type CollectionModels = typeof User | typeof User;
+
+interface RavenDocument {
+    '@metadata': {
+        '@id': string;
+    };
+    _id: string;
+}
+
 const magic = Symbol();
 
 export class DocumentFactory {
     private [magic] = 'unique';
+    [key: string]: any;
 
     constructor(document: GenericRecord) {
-        if (!document) {
-            console.warn(document);
-            return;
+        if (document) {
+            Object.keys(document).forEach(key => {
+                if (typeof document[key] !== 'function') {
+                    this[key] = document[key];
+                }
+            });
         }
-        Object.keys(document).forEach(key => {
-            if (typeof key === 'symbol') return;
-            (this as Record<string, unknown>)[key] = document[key];
-        });
+        console.warn('Invalid document:', document);
     }
 }
 
-export async function createDocument({
-    collection,
-    document,
-}: {
-    collection: string;
-    document: object;
-}): Promise<object & { id: string }> {
-    let session = store.openSession();
+export async function createDocument(document: GenericRecord): Promise<string> {
+    const session = store.openSession();
     const id = uuidv4();
-    (document as any)._id = id;
-    await session.store(document, `/${collection}/${id}`);
+    document._id = id;
+    await session.store(document);
     await session.saveChanges();
-    return (document as any).id;
+    return document.id as string;
 }
 
-export async function getDocument<T>({
-    collection,
-    id,
-}: {
-    collection: string;
-    id: string;
-}): Promise<T | null> {
-    let session = store.openSession();
-    let payload = session.query({ collection }).whereEquals('_id', id);
+export async function getDocument<T>(id: string): Promise<T | null> {
+    const session = store.openSession();
+    const payload = await session.load(id);
     return payload as T | null;
 }
 
 export async function getDocuments<T>(
-    collection: string,
-    { key, whereRegex, limit, page }: ISeacrOptions = {},
+    collection: CollectionModels,
+    { key, whereRegex, limit, page }: ISearchOptions = {},
 ): Promise<T[]> {
-    let session = store.openSession();
-    let payload = session.query({ collection });
+    const session = store.openSession();
+    let query = session.query({
+        indexName: 'Users/Name', // new UsersIndex().getIndexName()
+    });
 
-    if (whereRegex && key) {
-        payload = payload.whereRegex(key, whereRegex);
-    }
+    // if (key && whereRegex) {
+    //     query = query.whereRegex(key, whereRegex);
+    // }
 
-    if (page != null && limit != null) {
-        // Check for null or undefined
-        payload = payload.take(limit).skip(page * limit);
-    }
+    // if (typeof page === 'number' && typeof limit === 'number') {
+    //     return (await query
+    //         .skip(page * limit)
+    //         .take(limit)
+    //         .all()) as T[];
+    // }
 
-    return (await payload.all()) as T[];
+    return (await query.all()) as T[];
 }
 
-export async function bulkInsertDocumnets(payload: object[]) {
-    let session = store.openSession();
-    for (let item of payload) {
-        await session.store(item);
+export async function bulkInsertDocuments(documents: object[]) {
+    const session = store.openSession();
+    for (const document of documents) {
+        await session.store(document);
     }
     await session.saveChanges();
 }
 
-export async function deleteDocument({
-    id,
-}: {
-    collection: string;
-    id: string;
-}) {
-    let session = store.openSession();
+export async function deleteDocument(id: string) {
+    const session = store.openSession();
     await session.delete(id);
     await session.saveChanges();
 }
 
-export async function deleteCollection(collectionName: string): Promise<void> {
+export async function deleteCollection(
+    collectionName: CollectionModels,
+): Promise<void> {
     const session = store.openSession();
-
     try {
-        const query = session.query({ collection: collectionName });
-        const documents = await query.all();
-
-        // Delete each document
-        for (const doc of documents) {
-            await session.delete((doc as { id: string }).id);
+        const documents = await session.query(collectionName).all();
+        for (const document of documents) {
+            await session.delete(document);
         }
-
         await session.saveChanges();
     } catch (error) {
         console.error('Error deleting documents:', error);

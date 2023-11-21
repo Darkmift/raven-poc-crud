@@ -8,7 +8,6 @@ export const getUserById = async (
 ) => {
     try {
         const result = await getById({
-            collection: 'users',
             id: req.params.id,
         });
         res.status(200).json(result);
